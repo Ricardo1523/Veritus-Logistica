@@ -9,7 +9,6 @@
   var scannerPreview = document.getElementById('scanner-preview');
   var scannerArea    = document.getElementById('scanner-area');
   var btnAtivar      = document.getElementById('btn-ativar-camera');
-  var btnVerQrTeste  = document.getElementById('btn-ver-qr-teste');
   var infoFormatos   = document.getElementById('info-formatos');
 
   var html5QrScanner = null;
@@ -178,12 +177,6 @@
     });
   }
 
-  // Link para QR Codes de teste
-  if (btnVerQrTeste) {
-    btnVerQrTeste.addEventListener('click', function (e) {
-      e.preventDefault();
-      window.location.href = 'gerar-qr.html';
-    });
-  }
+
 
 })();

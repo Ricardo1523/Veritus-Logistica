@@ -71,13 +71,6 @@
             </svg>
             Acessar Sistema
           </button>
-
-          <button type="button" class="btn btn--outline btn--full btn--lg" id="btn-demo">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>
-            </svg>
-            Modo Demonstração
-          </button>
         </div>
 
         <div class="login__footer-link">
@@ -160,7 +153,6 @@
       var loginForm = document.getElementById('login-form');
       var registerForm = document.getElementById('register-form');
       var btnLogin = document.getElementById('btn-login');
-      var btnDemo = document.getElementById('btn-demo');
       var inputOperador = document.getElementById('operador');
       var inputSenha = document.getElementById('senha');
       var loginSubtitle = document.querySelector('.login__subtitle');
@@ -214,13 +206,11 @@
 
         if (typeof auth !== 'undefined' && typeof db !== 'undefined') {
           btnLogin.disabled = true;
-          btnDemo.disabled = true;
           btnLogin.textContent = 'Autenticando...';
 
           auth.signInWithEmailAndPassword(email, senha)
             .then(function (userCredential) {
               var user = userCredential.user;
-              // Buscar o papel do usuário no Firestore
               return db.collection('usuarios').doc(user.uid).get()
                 .then(function (doc) {
                   var role = 'analitico';
@@ -242,7 +232,6 @@
             .catch(function (error) {
               console.error('[Auth] Erro ao autenticar:', error);
               btnLogin.disabled = false;
-              btnDemo.disabled = false;
               btnLogin.innerHTML = `
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
@@ -262,7 +251,6 @@
               VeritusUI.showToast('❌ ' + msg, 'error');
             });
         } else {
-          // Fallback local offline
           localStorage.setItem('veritus_role', 'analitico');
           VeritusStore.setOperador(nome);
           window.location.href = 'home.html';
@@ -302,11 +290,8 @@
           auth.createUserWithEmailAndPassword(email, senha)
             .then(function (userCredential) {
               var user = userCredential.user;
-              
-              // Atualiza o display name do Auth
               user.updateProfile({ displayName: nomeCompleto });
 
-              // Salva o papel no Firestore na coleção "usuarios"
               return db.collection('usuarios').doc(user.uid).set({
                 displayName: nomeCompleto,
                 email: email,
@@ -347,7 +332,6 @@
               VeritusUI.showToast('❌ ' + msg, 'error');
             });
         } else {
-          // Fallback local offline
           localStorage.setItem('veritus_role', role);
           VeritusStore.setOperador(nomeCompleto);
           if (role === 'motorista') {
@@ -355,33 +339,6 @@
           } else {
             window.location.href = 'home.html';
           }
-        }
-      });
-
-      // ── LOGIC: DEMO ──────────────────────────────────────────
-
-      btnDemo.addEventListener('click', function () {
-        if (typeof auth !== 'undefined') {
-          btnDemo.disabled = true;
-          btnLogin.disabled = true;
-          btnDemo.textContent = 'Carregando Demo...';
-
-          auth.signInAnonymously()
-            .then(function () {
-              localStorage.setItem('veritus_role', 'analitico');
-              VeritusStore.setOperador('Operador Demo');
-              window.location.href = 'home.html';
-            })
-            .catch(function (error) {
-              console.warn('[Auth] Login anônimo falhou:', error);
-              localStorage.setItem('veritus_role', 'analitico');
-              VeritusStore.setOperador('Operador Demo');
-              window.location.href = 'home.html';
-            });
-        } else {
-          localStorage.setItem('veritus_role', 'analitico');
-          VeritusStore.setOperador('Operador Demo');
-          window.location.href = 'home.html';
         }
       });
 
