@@ -136,6 +136,10 @@
                   var displayName = user.displayName || nome;
                   
                   if (doc.exists) {
+                    if (doc.data().active === false) {
+                      auth.signOut();
+                      throw new Error('Conta desativada pelo administrador.');
+                    }
                     role = doc.data().role || 'operador';
                     displayName = doc.data().displayName || displayName;
                     
@@ -148,9 +152,19 @@
                       window.location.href = 'home.html';
                     }
                   } else {
-                    // Deslogar porque a conta não está ativa no firestore (deletada/inativa)
-                    auth.signOut();
-                    throw new Error('Conta desativada ou não cadastrada pelo administrador.');
+                    // Retrocompatibilidade: Se a conta existe no Auth do Firebase mas não no Firestore,
+                    // cria o documento automaticamente como ativa e perfil operador.
+                    role = 'operador';
+                    return db.collection('usuarios').doc(user.uid).set({
+                      displayName: displayName,
+                      email: email,
+                      role: role,
+                      active: true
+                    }).then(function () {
+                      localStorage.setItem('veritus_role', role);
+                      VeritusStore.setOperador(displayName);
+                      window.location.href = 'home.html';
+                    });
                   }
                 });
             })

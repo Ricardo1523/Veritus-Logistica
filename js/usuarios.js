@@ -54,7 +54,9 @@
     }
   }
 
-  function getRoleBadge(role) {
+  function getRoleBadge(user) {
+    if (user.active === false) return '<span class="status-badge" style="background: var(--text-muted); color: var(--bg-primary); padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm); font-size: var(--font-size-xs);">Inativo</span>';
+    var role = user.role;
     if (role === 'admin') return '<span class="status-badge status-badge--warning">Administrador</span>';
     if (role === 'motorista') return '<span class="status-badge status-badge--success">Motorista</span>';
     return '<span class="status-badge status-badge--info">Operador</span>';
@@ -97,7 +99,11 @@
       
       var actionBtn = '';
       if (!isSelf) {
-        actionBtn = '<button class="btn btn--outline btn--sm btn-deactivate" data-uid="' + user.uid + '" data-name="' + user.displayName + '" type="button">Desativar</button>';
+        if (user.active === false) {
+          actionBtn = '<button class="btn btn--success btn--sm btn-toggle-active" data-uid="' + user.uid + '" data-name="' + user.displayName + '" data-action="ativar" type="button">Ativar</button>';
+        } else {
+          actionBtn = '<button class="btn btn--outline btn--sm btn-deactivate btn-toggle-active" data-uid="' + user.uid + '" data-name="' + user.displayName + '" data-action="desativar" type="button">Desativar</button>';
+        }
       } else {
         actionBtn = '<span style="color: var(--text-muted); font-size: var(--font-size-xs);">Sessão Ativa</span>';
       }
@@ -105,7 +111,7 @@
       tr.innerHTML =
         '<td>' + user.displayName + '</td>' +
         '<td><code>' + loginShow + '</code></td>' +
-        '<td>' + getRoleBadge(user.role) + '</td>' +
+        '<td>' + getRoleBadge(user) + '</td>' +
         '<td style="text-align: right;">' + actionBtn + '</td>';
       tbody.appendChild(tr);
     });
@@ -116,45 +122,54 @@
     wrapper.appendChild(table);
     listContainer.appendChild(wrapper);
 
-    // Event listeners dos botões de desativar
-    var deactBtns = listContainer.querySelectorAll('.btn-deactivate');
-    deactBtns.forEach(function (btn) {
+    // Event listeners dos botões de ativar/desativar
+    var toggleBtns = listContainer.querySelectorAll('.btn-toggle-active');
+    toggleBtns.forEach(function (btn) {
       btn.addEventListener('click', function () {
         var uid = this.getAttribute('data-uid');
         var name = this.getAttribute('data-name');
-        confirmDeactivate(uid, name);
+        var action = this.getAttribute('data-action');
+        toggleUserStatus(uid, name, action);
       });
     });
   }
 
-  // ── DESATIVAR USUÁRIO ────────────────────────────────────────
+  // ── ATIVAR/DESATIVAR USUÁRIO ─────────────────────────────────
 
-  function confirmDeactivate(uid, name) {
+  function toggleUserStatus(uid, name, action) {
+    var isDeactivating = (action === 'desativar');
+    var modalTitle = isDeactivating ? 'Desativar Operador?' : 'Reativar Operador?';
+    var confirmBtnText = isDeactivating ? 'Desativar' : 'Reativar';
+
     VeritusUI.showModal({
-      title: 'Desativar Operador?',
-      confirmText: 'Desativar',
+      title: modalTitle,
+      confirmText: confirmBtnText,
       cancelText: 'Cancelar',
       fields: [
         { label: 'Nome', value: name },
         { label: 'ID do Usuário', value: uid }
       ],
       onConfirm: function () {
+        var newStatus = !isDeactivating; // true se ativando, false se desativando
         if (isFirebaseEnabled) {
-          db.collection('usuarios').doc(uid).delete()
+          db.collection('usuarios').doc(uid).update({ active: newStatus })
             .then(function () {
-              VeritusUI.showToast('✅ Usuário desativado com sucesso!', 'success');
+              VeritusUI.showToast('✅ Status do usuário atualizado com sucesso!', 'success');
               renderUsers();
             })
             .catch(function (error) {
-              console.error('[Usuarios] Erro ao desativar:', error);
-              VeritusUI.showToast('❌ Erro ao desativar usuário no banco.', 'error');
+              console.error('[Usuarios] Erro ao atualizar status:', error);
+              VeritusUI.showToast('❌ Erro ao atualizar status no banco.', 'error');
             });
         } else {
           // Fallback local
           var localUsers = JSON.parse(localStorage.getItem('veritus_usuarios') || '[]');
-          localUsers = localUsers.filter(function (u) { return u.uid !== uid; });
-          localStorage.setItem('veritus_usuarios', JSON.stringify(localUsers));
-          VeritusUI.showToast('✅ Usuário desativado com sucesso (local)!', 'success');
+          var userObj = localUsers.find(function (u) { return u.uid === uid; });
+          if (userObj) {
+            userObj.active = newStatus;
+            localStorage.setItem('veritus_usuarios', JSON.stringify(localUsers));
+          }
+          VeritusUI.showToast('✅ Status do usuário atualizado com sucesso (local)!', 'success');
           renderUsers();
         }
       }
@@ -205,7 +220,8 @@
               return db.collection('usuarios').doc(newUser.uid).set({
                 displayName: nome,
                 email: email,
-                role: role
+                role: role,
+                active: true
               });
             })
             .then(function () {
@@ -261,7 +277,8 @@
         displayName: nome,
         usuario: usuario,
         senha: senha,
-        role: role
+        role: role,
+        active: true
       };
 
       localUsers.push(newUserLocal);
