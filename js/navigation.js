@@ -8,6 +8,24 @@ document.addEventListener('DOMContentLoaded', function () {
   var path = window.location.pathname;
   var page = path.substring(path.lastIndexOf('/') + 1) || 'index.html';
 
+  // ── GUARDS DE ACESSO ─────────────────────────────────────────
+  var operador = localStorage.getItem('veritus_operador');
+  var role = localStorage.getItem('veritus_role') || 'analitico';
+
+  // Se não estiver logado, redireciona para a página de login
+  if (!operador && page !== 'index.html') {
+    window.location.href = 'index.html';
+    return;
+  }
+
+  // Se for motorista, só pode acessar gerar-qr.html
+  if (role === 'motorista' && page !== 'gerar-qr.html' && page !== 'index.html') {
+    window.location.href = 'gerar-qr.html';
+    return;
+  }
+
+  // ── CONFIGURAÇÃO DE NAVEGAÇÃO ────────────────────────────────
+
   // Mapeamento de página → id do nav item
   var navMap = {
     'home.html':       'nav-inicio',

@@ -13,7 +13,6 @@
   var statEficiencia = document.querySelector('#stat-eficiencia .stat-card__value');
   var chartProdutividade = document.getElementById('chart-produtividade');
   var chartDesempenho    = document.getElementById('chart-desempenho');
-  var btnQrTeste  = document.getElementById('btn-qr-teste');
   var headerName  = document.querySelector('.top-header__name');
 
   // ── Atualizar Operador ──────────────────────────────────────
@@ -122,18 +121,7 @@
     chartDesempenho.appendChild(listDiv);
   }
 
-  // ── QR Codes de Teste ───────────────────────────────────────
 
-  if (btnQrTeste) {
-    btnQrTeste.addEventListener('click', function (e) {
-      e.preventDefault();
-      var count = VeritusStore.gerarDemoViagens();
-      updateStats();
-      renderChartProdutividade();
-      renderDesempenho();
-      VeritusUI.showToast('✅ ' + count + ' viagens de teste adicionadas!', 'success');
-    });
-  }
 
   // ── Init ────────────────────────────────────────────────────
 
