@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Veritus Engenharia — Sistema Logístico de Controle de Produção de Caminhões. Acesse o sistema para gerenciar operações logísticas.">
+  <title>Veritus Engenharia — Login</title>
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f1724">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Veritus">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+  <main class="login" id="login-page">
+    <div class="login__card">
+      <!-- Logo -->
+      <div class="login__logo">
+        <div class="login__logo-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/>
+            <path d="M15 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 13.52 9H12"/>
+            <circle cx="17" cy="18" r="2"/>
+            <circle cx="7" cy="18" r="2"/>
+          </svg>
+        </div>
+        <h1 class="login__title">Veritus Engenharia</h1>
+        <p class="login__subtitle">Controle de Produção de Caminhões</p>
+      </div>
+
+      <!-- Formulário -->
+      <form class="login__form" id="login-form" onsubmit="return false;">
+        <div class="form-group">
+          <label class="form-group__label" for="operador">Operador</label>
+          <input 
+            type="text" 
+            class="input-field" 
+            id="operador" 
+            name="operador" 
+            placeholder="Digite seu ID de operador"
+            autocomplete="username"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-group__label" for="senha">Senha</label>
+          <input 
+            type="password" 
+            class="input-field" 
+            id="senha" 
+            name="senha" 
+            placeholder="Digite sua senha"
+            autocomplete="current-password"
+          >
+        </div>
+
+        <div class="login__actions">
+          <button type="button" class="btn btn--primary btn--full btn--lg" id="btn-login">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Acessar Sistema
+          </button>
+
+          <button type="button" class="btn btn--outline btn--full btn--lg" id="btn-demo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+            Modo Demonstração
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Firebase SDKs (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/ui.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var btnLogin = document.getElementById('btn-login');
+      var btnDemo = document.getElementById('btn-demo');
+      var inputOperador = document.getElementById('operador');
+      var inputSenha = document.getElementById('senha');
+
+      btnLogin.addEventListener('click', function () {
+        var nome = (inputOperador.value || '').trim();
+        var senha = (inputSenha.value || '').trim();
+
+        if (!nome) {
+          inputOperador.style.borderColor = 'var(--accent-primary)';
+          inputOperador.style.boxShadow = '0 0 0 3px var(--accent-primary-light)';
+          inputOperador.focus();
+          return;
+        }
+
+        if (!senha) {
+          inputSenha.style.borderColor = 'var(--accent-primary)';
+          inputSenha.style.boxShadow = '0 0 0 3px var(--accent-primary-light)';
+          inputSenha.focus();
+          return;
+        }
+
+        // Se o operador digitar apenas o ID, adiciona o domínio da marca
+        var email = nome.includes('@') ? nome : nome.toLowerCase() + '@veritus.com';
+
+        if (typeof auth !== 'undefined') {
+          // Desabilitar botões durante autenticação
+          btnLogin.disabled = true;
+          btnDemo.disabled = true;
+          btnLogin.textContent = 'Autenticando...';
+
+          auth.signInWithEmailAndPassword(email, senha)
+            .then(function (userCredential) {
+              var user = userCredential.user;
+              // Salva operador localmente e avança
+              VeritusStore.setOperador(user.displayName || nome);
+              window.location.href = 'home.html';
+            })
+            .catch(function (error) {
+              console.error('[Auth] Erro ao autenticar:', error);
+              btnLogin.disabled = false;
+              btnDemo.disabled = false;
+              btnLogin.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                Acessar Sistema
+              `;
+
+              var msg = 'Erro ao realizar login.';
+              if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                msg = 'Senha incorreta para este operador.';
+              } else if (error.code === 'auth/user-not-found') {
+                msg = 'Operador não cadastrado no sistema.';
+              } else if (error.code === 'auth/invalid-email') {
+                msg = 'ID do operador inválido.';
+              }
+              VeritusUI.showToast('❌ ' + msg, 'error');
+            });
+        } else {
+          // Fallback offline / sem Firebase carregado
+          VeritusStore.setOperador(nome);
+          window.location.href = 'home.html';
+        }
+      });
+
+      btnDemo.addEventListener('click', function () {
+        if (typeof auth !== 'undefined') {
+          btnDemo.disabled = true;
+          btnLogin.disabled = true;
+          btnDemo.textContent = 'Carregando Demo...';
+
+          // Tenta entrar anonimamente
+          auth.signInAnonymously()
+            .then(function () {
+              VeritusStore.setOperador('Operador Demo');
+              window.location.href = 'home.html';
+            })
+            .catch(function (error) {
+              console.warn('[Auth] Login anônimo indisponível. Avançando offline:', error);
+              // Fallback para quando o provedor anônimo está desligado no console
+              VeritusStore.setOperador('Operador Demo');
+              window.location.href = 'home.html';
+            });
+        } else {
+          VeritusStore.setOperador('Operador Demo');
+          window.location.href = 'home.html';
+        }
+      });
+
+      // Enter key submits
+      inputOperador.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') btnLogin.click();
+      });
+      inputSenha.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') btnLogin.click();
+      });
+    });
+  </script>
+  <script src="js/pwa-register.js"></script>
+</body>
+</html>

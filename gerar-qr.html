@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Veritus Engenharia — Geração de QR Code para identificação de veículos e registro de viagens.">
+  <title>Veritus Engenharia — Gerar QR Code</title>
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f1724">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Veritus">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+  <div class="app app--with-nav">
+
+    <!-- ── Header ── -->
+    <header class="page-header" id="gerar-qr-header">
+      <div class="page-header__left">
+        <svg class="page-header__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/>
+          <rect width="5" height="5" x="3" y="16" rx="1"/><rect width="5" height="5" x="16" y="16" rx="1"/>
+          <path d="M10 3h4"/><path d="M10 16h4"/><path d="M3 10v4"/><path d="M16 10v4"/>
+        </svg>
+        <h1 class="page-header__title">Gerar QR Code</h1>
+      </div>
+      <a href="home.html" class="page-header__action" id="btn-voltar-home" title="Voltar ao início" aria-label="Voltar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </a>
+    </header>
+
+    <!-- ── Conteúdo ── -->
+    <main class="page-content" id="gerar-qr-content">
+
+      <!-- Info Motorista -->
+      <div class="card" style="margin-bottom: var(--space-6);">
+        <div class="chart-section__header" style="margin-bottom: 0;">
+          <svg class="chart-section__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/>
+            <path d="M15 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 13.52 9H12"/>
+            <circle cx="17" cy="18" r="2"/>
+            <circle cx="7" cy="18" r="2"/>
+          </svg>
+          <h2 class="chart-section__title">Dados do Veículo</h2>
+        </div>
+      </div>
+
+      <!-- Formulário de Geração -->
+      <form class="gerar-qr-form" id="form-gerar-qr">
+        <div class="form-group">
+          <label class="form-group__label" for="placa">Placa do Veículo</label>
+          <input 
+            type="text" 
+            class="input-field" 
+            id="placa" 
+            name="placa" 
+            placeholder="Ex: ABC-1D23"
+            maxlength="8"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-group__label" for="corte">Tipo de Corte</label>
+          <input 
+            type="text" 
+            class="input-field" 
+            id="corte" 
+            name="corte" 
+            placeholder="Informe o tipo de corte"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-group__label" for="aterro">Aterro</label>
+          <input 
+            type="text" 
+            class="input-field" 
+            id="aterro" 
+            name="aterro" 
+            placeholder="Informe o aterro de destino"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-group__label" for="carga">Carga</label>
+          <input 
+            type="text" 
+            class="input-field" 
+            id="carga" 
+            name="carga" 
+            placeholder="Descreva a carga transportada"
+          >
+        </div>
+
+        <button class="btn btn--primary btn--full btn--lg" id="btn-gerar-qr" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/>
+            <rect width="5" height="5" x="3" y="16" rx="1"/><rect width="5" height="5" x="16" y="16" rx="1"/>
+            <path d="M10 3h4"/><path d="M10 16h4"/><path d="M3 10v4"/><path d="M16 10v4"/>
+          </svg>
+          Gerar QR Code
+        </button>
+      </form>
+
+      <!-- Área de exibição do QR Code gerado -->
+      <div class="qr-display" id="qr-display">
+        <div class="qr-display__placeholder">
+          <svg class="qr-display__placeholder-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/>
+            <rect width="5" height="5" x="3" y="16" rx="1"/><rect width="5" height="5" x="16" y="16" rx="1"/>
+            <path d="M10 3h4"/><path d="M10 16h4"/><path d="M3 10v4"/><path d="M16 10v4"/>
+          </svg>
+        </div>
+        <p class="qr-display__text">Preencha os dados e clique em "Gerar QR Code"</p>
+      </div>
+    </main>
+
+    <!-- ── Bottom Nav (Simplificada para Motorista) ── -->
+    <nav class="bottom-nav" id="bottom-nav" aria-label="Navegação motorista">
+      <a href="gerar-qr.html" class="bottom-nav__item bottom-nav__item--active" id="nav-gerar-qr">
+        <svg class="bottom-nav__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/>
+          <rect width="5" height="5" x="3" y="16" rx="1"/><rect width="5" height="5" x="16" y="16" rx="1"/>
+          <path d="M10 3h4"/><path d="M10 16h4"/><path d="M3 10v4"/><path d="M16 10v4"/>
+        </svg>
+        <span class="bottom-nav__label">Gerar QR</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Firebase SDKs (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-init.js"></script>
+
+  <script src="js/store.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/gerar-qr.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/pwa-register.js"></script>
+</body>
+</html>

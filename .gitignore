@@ -1,0 +1,16 @@
+# Logs e Arquivos Temporários
+*.log
+.DS_Store
+Thumbs.db
+
+# Configurações de IDE e cache local
+.vscode/
+.idea/
+.gemini/
+node_modules/
+npm-debug.log*
+
+# Imagens de referência (opcional, remova se quiser subir as screenshots das telas)
+*.png
+!icons/*.png
+!favicon.ico

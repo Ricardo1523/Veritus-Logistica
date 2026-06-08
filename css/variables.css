@@ -1,0 +1,107 @@
+/* ============================================================
+   VERITUS ENGENHARIA — Design Tokens
+   Sistema Logístico · Controle de Produção de Caminhões
+   ============================================================ */
+
+:root {
+  /* ── Cores de Background ── */
+  --bg-primary:       #0f1724;
+  --bg-secondary:     #1a2332;
+  --bg-card:          #1e2a3a;
+  --bg-card-hover:    #243347;
+  --bg-input:         #1a2332;
+  --bg-overlay:       rgba(15, 23, 36, 0.85);
+
+  /* ── Bordas ── */
+  --border-subtle:    rgba(255, 255, 255, 0.08);
+  --border-card:      rgba(255, 255, 255, 0.10);
+  --border-input:     rgba(255, 255, 255, 0.15);
+  --border-dashed:    rgba(255, 255, 255, 0.20);
+
+  /* ── Accent: Laranja / Amber ── */
+  --accent-primary:   #f5a623;
+  --accent-primary-hover: #e6991a;
+  --accent-primary-light: rgba(245, 166, 35, 0.15);
+  --accent-primary-text:  #f5a623;
+
+  /* ── Accent: Verde ── */
+  --accent-success:       #22c55e;
+  --accent-success-hover: #16a34a;
+  --accent-success-dark:  #166534;
+
+  /* ── Accent: Azul ── */
+  --accent-info:          #3b82f6;
+  --accent-info-hover:    #2563eb;
+  --accent-info-dark:     #1e40af;
+
+  /* ── Accent: Roxo ── */
+  --accent-purple:        #6366f1;
+  --accent-purple-hover:  #4f46e5;
+  --accent-purple-light:  rgba(99, 102, 241, 0.15);
+
+  /* ── Texto ── */
+  --text-primary:     #ffffff;
+  --text-secondary:   #94a3b8;
+  --text-muted:       #64748b;
+  --text-disabled:    #475569;
+  --text-dark:        #0f172a;
+
+  /* ── Tipografia ── */
+  --font-family:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-size-xs:     0.75rem;    /* 12px */
+  --font-size-sm:     0.875rem;   /* 14px */
+  --font-size-base:   1rem;       /* 16px */
+  --font-size-lg:     1.125rem;   /* 18px */
+  --font-size-xl:     1.25rem;    /* 20px */
+  --font-size-2xl:    1.5rem;     /* 24px */
+  --font-size-3xl:    1.875rem;   /* 30px */
+  --font-size-4xl:    2.25rem;    /* 36px */
+
+  --font-weight-normal:  400;
+  --font-weight-medium:  500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:    700;
+
+  --line-height-tight:   1.2;
+  --line-height-normal:  1.5;
+  --line-height-relaxed: 1.625;
+
+  /* ── Espaçamento ── */
+  --space-1:    0.25rem;   /* 4px */
+  --space-2:    0.5rem;    /* 8px */
+  --space-3:    0.75rem;   /* 12px */
+  --space-4:    1rem;      /* 16px */
+  --space-5:    1.25rem;   /* 20px */
+  --space-6:    1.5rem;    /* 24px */
+  --space-8:    2rem;      /* 32px */
+  --space-10:   2.5rem;    /* 40px */
+  --space-12:   3rem;      /* 48px */
+  --space-16:   4rem;      /* 64px */
+
+  /* ── Border Radius ── */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   18px;
+  --radius-2xl:  24px;
+  --radius-full: 9999px;
+
+  /* ── Sombras ── */
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md:   0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg:   0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-xl:   0 12px 40px rgba(0, 0, 0, 0.4);
+  --shadow-glow-amber: 0 0 20px rgba(245, 166, 35, 0.25);
+  --shadow-glow-green: 0 0 20px rgba(34, 197, 94, 0.20);
+  --shadow-glow-blue:  0 0 20px rgba(59, 130, 246, 0.20);
+
+  /* ── Transições ── */
+  --transition-fast:   150ms ease;
+  --transition-base:   250ms ease;
+  --transition-slow:   400ms ease;
+
+  /* ── Layout ── */
+  --max-width-app:     480px;
+  --bottom-nav-height: 72px;
+  --header-height:     60px;
+}
