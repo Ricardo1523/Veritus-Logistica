@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Veritus Engenharia — Gerenciamento de Usuários. Crie e desative perfis de acesso do sistema logístico.">
+  <title>Veritus Engenharia — Usuários</title>
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f1724">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Veritus">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+  <div class="app app--with-nav">
+
+    <!-- ── Header ── -->
+    <header class="page-header" id="usuarios-header">
+      <div class="page-header__left">
+        <svg class="page-header__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <h1 class="page-header__title">Gerenciamento de Usuários</h1>
+      </div>
+      <a href="home.html" class="page-header__action" id="btn-voltar-home" title="Voltar ao início" aria-label="Voltar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </a>
+    </header>
+
+    <!-- ── Conteúdo Principal ── -->
+    <main class="page-content" id="usuarios-content" style="padding-bottom: calc(var(--bottom-nav-height) + var(--space-6));">
+      
+      <!-- Formulário de Cadastro de Usuário -->
+      <section class="card" style="margin-bottom: var(--space-6);">
+        <h2 class="card__title" style="margin-bottom: var(--space-4); font-size: var(--font-size-lg); display: flex; align-items: center; gap: var(--space-2);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <line x1="19" y1="8" x2="19" y2="14"/>
+            <line x1="22" y1="11" x2="16" y2="11"/>
+          </svg>
+          Cadastrar Novo Usuário
+        </h2>
+        
+        <form class="login__form" id="create-user-form" onsubmit="return false;" style="margin-top: 0; padding: 0; background: transparent; border: none; box-shadow: none;">
+          <div class="form-group">
+            <label class="form-group__label" for="user-nome">Nome Completo</label>
+            <input 
+              type="text" 
+              class="input-field" 
+              id="user-nome" 
+              placeholder="Digite o nome completo do operador"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-group__label" for="user-operador">Nome de Usuário (Login)</label>
+            <input 
+              type="text" 
+              class="input-field" 
+              id="user-operador" 
+              placeholder="Digite o ID de login (ex: ricardo)"
+              autocomplete="username"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-group__label" for="user-senha">Senha de Acesso</label>
+            <input 
+              type="password" 
+              class="input-field" 
+              id="user-senha" 
+              placeholder="Crie uma senha (mín. 6 caracteres)"
+              autocomplete="new-password"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-group__label" for="user-perfil">Modalidade de Acesso</label>
+            <select class="input-field" id="user-perfil">
+              <option value="operador">📈 Operador Geral (Acessos Padrões)</option>
+              <option value="admin">🔑 Administrador Geral</option>
+              <option value="motorista">🚛 Motorista (Gerador de QR Code)</option>
+            </select>
+          </div>
+
+          <button type="button" class="btn btn--primary btn--full btn--lg" id="btn-criar-usuario" style="margin-top: var(--space-4);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"/><path d="M12 5v14"/>
+            </svg>
+            Criar Usuário
+          </button>
+        </form>
+      </section>
+
+      <!-- Listagem de Usuários -->
+      <section class="card">
+        <h2 class="card__title" style="margin-bottom: var(--space-4); font-size: var(--font-size-lg); display: flex; align-items: center; gap: var(--space-2);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          Contas Cadastradas
+        </h2>
+        
+        <div id="usuarios-list-container">
+          <!-- Tabela de usuários inserida via JS -->
+          <div class="empty-state">
+            <p class="empty-state__text">Carregando usuários cadastrados...</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ── Bottom Nav (Injetado dinamicamente via navigation.js) ── -->
+    <nav class="bottom-nav" id="bottom-nav" aria-label="Navegação principal">
+      <a href="home.html" class="bottom-nav__item" id="nav-inicio">
+        <svg class="bottom-nav__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span class="bottom-nav__label">Início</span>
+      </a>
+      <a href="scanner.html" class="bottom-nav__item" id="nav-scanner">
+        <svg class="bottom-nav__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/>
+          <rect width="5" height="5" x="3" y="16" rx="1"/><rect width="5" height="5" x="16" y="16" rx="1"/>
+          <path d="M10 3h4"/><path d="M10 16h4"/><path d="M3 10v4"/><path d="M16 10v4"/>
+        </svg>
+        <span class="bottom-nav__label">Scanner</span>
+      </a>
+      <a href="historico.html" class="bottom-nav__item" id="nav-historico">
+        <svg class="bottom-nav__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+          <path d="M3 3v5h5"/>
+          <path d="M12 7v5l4 2"/>
+        </svg>
+        <span class="bottom-nav__label">Histórico</span>
+      </a>
+      <a href="relatorios.html" class="bottom-nav__item" id="nav-relatorios">
+        <svg class="bottom-nav__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+          <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+          <path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/>
+        </svg>
+        <span class="bottom-nav__label">Relatórios</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Firebase SDKs (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-init.js"></script>
+
+  <script src="js/store.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/usuarios.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/pwa-register.js"></script>
+</body>
+</html>

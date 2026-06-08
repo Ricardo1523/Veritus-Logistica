@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ── GUARDS DE ACESSO ─────────────────────────────────────────
   var operador = localStorage.getItem('veritus_operador');
-  var role = localStorage.getItem('veritus_role') || 'analitico';
+  var role = localStorage.getItem('veritus_role') || 'operador';
 
   // Se não estiver logado, redireciona para a página de login
   if (!operador && page !== 'index.html') {
@@ -24,7 +24,32 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
+  // Se não for admin, não pode acessar usuarios.html
+  if (role !== 'admin' && page === 'usuarios.html') {
+    window.location.href = 'home.html';
+    return;
+  }
+
   // ── CONFIGURAÇÃO DE NAVEGAÇÃO ────────────────────────────────
+
+  // Injetar aba "Usuários" dinamicamente para Administrador
+  var bottomNav = document.getElementById('bottom-nav');
+  if (role === 'admin' && bottomNav && !document.getElementById('nav-usuarios')) {
+    var userLink = document.createElement('a');
+    userLink.href = 'usuarios.html';
+    userLink.className = 'bottom-nav__item';
+    userLink.id = 'nav-usuarios';
+    userLink.innerHTML = `
+      <svg class="bottom-nav__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <span class="bottom-nav__label">Usuários</span>
+    `;
+    bottomNav.appendChild(userLink);
+  }
 
   // Mapeamento de página → id do nav item
   var navMap = {
@@ -32,7 +57,8 @@ document.addEventListener('DOMContentLoaded', function () {
     'scanner.html':    'nav-scanner',
     'historico.html':  'nav-historico',
     'relatorios.html': 'nav-relatorios',
-    'gerar-qr.html':  'nav-gerar-qr'
+    'gerar-qr.html':   'nav-gerar-qr',
+    'usuarios.html':   'nav-usuarios'
   };
 
   var activeId = navMap[page];
@@ -47,5 +73,30 @@ document.addEventListener('DOMContentLoaded', function () {
   var activeItem = document.getElementById(activeId);
   if (activeItem) {
     activeItem.classList.add('bottom-nav__item--active');
+  }
+
+  // ── LOGOUT GLOBAL ────────────────────────────────────────────
+  var btnLogout = document.getElementById('btn-logout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', function (e) {
+      e.preventDefault();
+      
+      var doLogout = function () {
+        localStorage.removeItem('veritus_operador');
+        localStorage.removeItem('veritus_role');
+        window.location.href = 'index.html';
+      };
+
+      if (typeof auth !== 'undefined') {
+        auth.signOut()
+          .then(doLogout)
+          .catch(function (err) {
+            console.error('[Logout] Erro ao deslogar do Firebase:', err);
+            doLogout();
+          });
+      } else {
+        doLogout();
+      }
+    });
   }
 });

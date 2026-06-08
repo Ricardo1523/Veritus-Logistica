@@ -6,6 +6,15 @@
 (function () {
   'use strict';
 
+  // Ajustar botões do header baseado na role do usuário
+  var role = localStorage.getItem('veritus_role') || 'operador';
+  if (role === 'motorista') {
+    var btnVoltar = document.getElementById('btn-voltar-home');
+    var btnLogout = document.getElementById('btn-logout');
+    if (btnVoltar) btnVoltar.style.display = 'none';
+    if (btnLogout) btnLogout.style.display = 'flex';
+  }
+
   var form        = document.getElementById('form-gerar-qr');
   var btnGerar    = document.getElementById('btn-gerar-qr');
   var qrDisplay   = document.getElementById('qr-display');

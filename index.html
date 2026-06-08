@@ -73,68 +73,6 @@
           </button>
         </div>
 
-        <div class="login__footer-link">
-          Não tem conta? <a href="#" id="link-to-register">Cadastre-se</a>
-        </div>
-      </form>
-
-      <!-- Formulário de Cadastro -->
-      <form class="login__form" id="register-form" style="display: none;" onsubmit="return false;">
-        <div class="form-group">
-          <label class="form-group__label" for="reg-nome">Nome Completo</label>
-          <input 
-            type="text" 
-            class="input-field" 
-            id="reg-nome" 
-            placeholder="Digite seu nome completo"
-          >
-        </div>
-
-        <div class="form-group">
-          <label class="form-group__label" for="reg-operador">Nome de Usuário (Login)</label>
-          <input 
-            type="text" 
-            class="input-field" 
-            id="reg-operador" 
-            placeholder="Crie seu ID de acesso (ex: ricardo)"
-            autocomplete="username"
-          >
-        </div>
-
-        <div class="form-group">
-          <label class="form-group__label" for="reg-senha">Senha</label>
-          <input 
-            type="password" 
-            class="input-field" 
-            id="reg-senha" 
-            placeholder="Crie uma senha (mín. 6 caracteres)"
-            autocomplete="new-password"
-          >
-        </div>
-
-        <div class="form-group">
-          <label class="form-group__label" for="reg-perfil">Modalidade de Acesso</label>
-          <select class="input-field" id="reg-perfil">
-            <option value="analitico">📈 Usuário Analítico (Dashboard e Operações)</option>
-            <option value="motorista">🚛 Usuário Motorista (Gerador de QR Code)</option>
-          </select>
-        </div>
-
-        <div class="login__actions">
-          <button type="button" class="btn btn--primary btn--full btn--lg" id="btn-registrar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <line x1="19" y1="8" x2="19" y2="14"/>
-              <line x1="22" y1="11" x2="16" y2="11"/>
-            </svg>
-            Criar Minha Conta
-          </button>
-        </div>
-
-        <div class="login__footer-link">
-          Já tem conta? <a href="#" id="link-to-login">Acessar Sistema</a>
-        </div>
       </form>
     </div>
   </main>
@@ -149,38 +87,19 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      // Toggle de Modo de Teste Offline/Local via query param (?offline=true)
+      var urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('offline')) {
+        localStorage.setItem('veritus_offline', urlParams.get('offline'));
+      }
+      var isOfflineMode = localStorage.getItem('veritus_offline') === 'true';
+
       // Elementos do Formulário de Login
       var loginForm = document.getElementById('login-form');
-      var registerForm = document.getElementById('register-form');
       var btnLogin = document.getElementById('btn-login');
       var inputOperador = document.getElementById('operador');
       var inputSenha = document.getElementById('senha');
       var loginSubtitle = document.querySelector('.login__subtitle');
-
-      // Elementos do Formulário de Registro
-      var btnRegistrar = document.getElementById('btn-registrar');
-      var inputRegNome = document.getElementById('reg-nome');
-      var inputRegOperador = document.getElementById('reg-operador');
-      var inputRegSenha = document.getElementById('reg-senha');
-      var selectRegPerfil = document.getElementById('reg-perfil');
-
-      // Alternar entre Telas
-      var linkToRegister = document.getElementById('link-to-register');
-      var linkToLogin = document.getElementById('link-to-login');
-
-      linkToRegister.addEventListener('click', function (e) {
-        e.preventDefault();
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
-        loginSubtitle.textContent = 'Cadastro de Usuário / Motorista';
-      });
-
-      linkToLogin.addEventListener('click', function (e) {
-        e.preventDefault();
-        registerForm.style.display = 'none';
-        loginForm.style.display = 'block';
-        loginSubtitle.textContent = 'Controle de Produção de Caminhões';
-      });
 
       // ── LOGIC: LOGIN ──────────────────────────────────────────
 
@@ -204,7 +123,7 @@
 
         var email = nome.includes('@') ? nome : nome.toLowerCase() + '@veritus.com';
 
-        if (typeof auth !== 'undefined' && typeof db !== 'undefined') {
+        if (typeof auth !== 'undefined' && typeof db !== 'undefined' && !isOfflineMode) {
           btnLogin.disabled = true;
           btnLogin.textContent = 'Autenticando...';
 
@@ -213,19 +132,25 @@
               var user = userCredential.user;
               return db.collection('usuarios').doc(user.uid).get()
                 .then(function (doc) {
-                  var role = 'analitico';
+                  var role = 'operador';
                   var displayName = user.displayName || nome;
+                  
                   if (doc.exists) {
-                    role = doc.data().role || 'analitico';
+                    role = doc.data().role || 'operador';
                     displayName = doc.data().displayName || displayName;
-                  }
-                  localStorage.setItem('veritus_role', role);
-                  VeritusStore.setOperador(displayName);
+                    
+                    localStorage.setItem('veritus_role', role);
+                    VeritusStore.setOperador(displayName);
 
-                  if (role === 'motorista') {
-                    window.location.href = 'gerar-qr.html';
+                    if (role === 'motorista') {
+                      window.location.href = 'gerar-qr.html';
+                    } else {
+                      window.location.href = 'home.html';
+                    }
                   } else {
-                    window.location.href = 'home.html';
+                    // Deslogar porque a conta não está ativa no firestore (deletada/inativa)
+                    auth.signOut();
+                    throw new Error('Conta desativada ou não cadastrada pelo administrador.');
                   }
                 });
             })
@@ -241,7 +166,9 @@
               `;
 
               var msg = 'Erro ao realizar login.';
-              if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+              if (error.message === 'Conta desativada ou não cadastrada pelo administrador.') {
+                msg = error.message;
+              } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
                 msg = 'Senha incorreta para este operador.';
               } else if (error.code === 'auth/user-not-found') {
                 msg = 'Operador não cadastrado no sistema.';
@@ -251,93 +178,32 @@
               VeritusUI.showToast('❌ ' + msg, 'error');
             });
         } else {
-          localStorage.setItem('veritus_role', 'analitico');
-          VeritusStore.setOperador(nome);
-          window.location.href = 'home.html';
-        }
-      });
-
-      // ── LOGIC: REGISTRO ────────────────────────────────────────
-
-      btnRegistrar.addEventListener('click', function () {
-        var nomeCompleto = (inputRegNome.value || '').trim();
-        var usuario = (inputRegOperador.value || '').trim();
-        var senha = (inputRegSenha.value || '').trim();
-        var role = selectRegPerfil.value;
-
-        if (!nomeCompleto) {
-          inputRegNome.focus();
-          VeritusUI.showToast('⚠️ Digite seu nome completo.', 'warning');
-          return;
-        }
-        if (!usuario) {
-          inputRegOperador.focus();
-          VeritusUI.showToast('⚠️ Digite um nome de usuário para login.', 'warning');
-          return;
-        }
-        if (senha.length < 6) {
-          inputRegSenha.focus();
-          VeritusUI.showToast('⚠️ A senha deve ter no mínimo 6 caracteres.', 'warning');
-          return;
-        }
-
-        var email = usuario.includes('@') ? usuario : usuario.toLowerCase() + '@veritus.com';
-
-        if (typeof auth !== 'undefined' && typeof db !== 'undefined') {
-          btnRegistrar.disabled = true;
-          btnRegistrar.textContent = 'Registrando...';
-
-          auth.createUserWithEmailAndPassword(email, senha)
-            .then(function (userCredential) {
-              var user = userCredential.user;
-              user.updateProfile({ displayName: nomeCompleto });
-
-              return db.collection('usuarios').doc(user.uid).set({
-                displayName: nomeCompleto,
-                email: email,
-                role: role
-              }).then(function () {
-                localStorage.setItem('veritus_role', role);
-                VeritusStore.setOperador(nomeCompleto);
-
-                VeritusUI.showToast('✅ Conta criada com sucesso!', 'success');
-                setTimeout(function () {
-                  if (role === 'motorista') {
-                    window.location.href = 'gerar-qr.html';
-                  } else {
-                    window.location.href = 'home.html';
-                  }
-                }, 1500);
-              });
-            })
-            .catch(function (error) {
-              console.error('[Auth] Erro ao cadastrar:', error);
-              btnRegistrar.disabled = false;
-              btnRegistrar.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                </svg>
-                Criar Minha Conta
-              `;
-
-              var msg = 'Erro ao criar conta.';
-              if (error.code === 'auth/email-already-in-use') {
-                msg = 'Este nome de usuário já está em uso.';
-              } else if (error.code === 'auth/invalid-email') {
-                msg = 'Formato de usuário inválido.';
-              } else if (error.code === 'auth/weak-password') {
-                msg = 'Senha muito fraca.';
-              }
-              VeritusUI.showToast('❌ ' + msg, 'error');
+          // Fallback local (offline)
+          var localUsers = JSON.parse(localStorage.getItem('veritus_usuarios') || '[]');
+          if (localUsers.length === 0) {
+            localUsers.push({
+              displayName: 'Administrador Geral',
+              usuario: 'admin',
+              senha: 'admin',
+              role: 'admin'
             });
-        } else {
-          localStorage.setItem('veritus_role', role);
-          VeritusStore.setOperador(nomeCompleto);
-          if (role === 'motorista') {
-            window.location.href = 'gerar-qr.html';
+            localStorage.setItem('veritus_usuarios', JSON.stringify(localUsers));
+          }
+
+          var foundUser = localUsers.find(function(u) {
+            return u.usuario.toLowerCase() === nome.toLowerCase() && u.senha === senha;
+          });
+
+          if (foundUser) {
+            localStorage.setItem('veritus_role', foundUser.role);
+            VeritusStore.setOperador(foundUser.displayName);
+            if (foundUser.role === 'motorista') {
+              window.location.href = 'gerar-qr.html';
+            } else {
+              window.location.href = 'home.html';
+            }
           } else {
-            window.location.href = 'home.html';
+            VeritusUI.showToast('❌ Usuário ou senha incorretos.', 'error');
           }
         }
       });
