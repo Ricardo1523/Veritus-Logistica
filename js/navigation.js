@@ -1,6 +1,7 @@
 /* ============================================================
    VERITUS ENGENHARIA — Navegação
    Marca o item ativo no bottom nav baseado na página atual.
+   Controle de acesso por perfil: admin, operador, motorista.
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -24,16 +25,37 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
-  // Se não for admin, não pode acessar usuarios.html
+  // Se não for admin, não pode acessar usuarios.html nem relatorios.html
   if (role !== 'admin' && page === 'usuarios.html') {
+    window.location.href = 'home.html';
+    return;
+  }
+  if (role === 'operador' && page === 'relatorios.html') {
     window.location.href = 'home.html';
     return;
   }
 
   // ── CONFIGURAÇÃO DE NAVEGAÇÃO ────────────────────────────────
 
-  // Injetar aba "Usuários" dinamicamente para Administrador
   var bottomNav = document.getElementById('bottom-nav');
+
+  // Ocultar aba "Relatórios" para operador (não tem permissão)
+  if (role === 'operador' && bottomNav) {
+    var relatoriosNav = document.getElementById('nav-relatorios');
+    if (relatoriosNav) {
+      relatoriosNav.style.display = 'none';
+    }
+  }
+
+  // Ocultar botão de Relatórios na home para operador
+  if (role === 'operador') {
+    var btnRelatoriosHome = document.getElementById('btn-relatorios');
+    if (btnRelatoriosHome) {
+      btnRelatoriosHome.style.display = 'none';
+    }
+  }
+
+  // Injetar aba "Usuários" dinamicamente para Administrador
   if (role === 'admin' && bottomNav && !document.getElementById('nav-usuarios')) {
     var userLink = document.createElement('a');
     userLink.href = 'usuarios.html';
